@@ -109,9 +109,3 @@ while True:
     img[0:90, 0:640] = header
     cv2.imshow('Image',img)
     cv2.waitKey(1)
-
-
-
-
-
-
