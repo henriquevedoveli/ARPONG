@@ -62,7 +62,7 @@ while True:
                 elif 70 < x1 < 150:
                     header = overlayList[3]
                     # Blue with reduced brightness
-                    DRAW_COLOR = (int(0.3 * 255), int(2 * 0), int(0.3 * 255))
+                    DRAW_COLOR = (0, 0, 255)
 
             cv2.rectangle(img, (x1, y1-20), (x2, y2+20), DRAW_COLOR, cv2.FILLED)
 
