@@ -7,7 +7,7 @@
 import cv2
 import numpy as np
 import os
-from handTracking import HandTracking as ht
+import handTracking as ht
 
 ###########################
 # size header 640x90
@@ -65,13 +65,13 @@ while True:
             if y1 < 90:
                 # Valores encontrados na base de tentativa e erro
                 if 250<x1<350:
-                    header = overlayList[0]
+                    header = overlayList[2]
                     drawColor = (255,0,0)
                 elif 500<x1<600:
                     header = overlayList[1]
                     drawColor = (0,0,0)
                 elif 400<x1<450:
-                    header = overlayList[2]
+                    header = overlayList[0]
                     drawColor = (0,255,0)
                 elif 70<x1<150:
                     header = overlayList[3]    
