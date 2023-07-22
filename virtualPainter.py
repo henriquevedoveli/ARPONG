@@ -7,13 +7,13 @@
 import cv2
 import numpy as np
 import os
-import HandTracking as ht
+from handTracking import HandTracking as ht
 
 ###########################
 # size header 640x90
 brushThickness = 15
 eraseThickness = 25
-folderPath = 'header'
+folderPath = 'assets'
 drawColor = (255,0,0)
 xp, yp =0,0
 wCam, hCam = 640, 480
