@@ -1,64 +1,67 @@
-# Criado em  : 2021-05-24
-# Ult. att   : 2021-06-01
-# 
-# Autor      : Henrique Vedoveli <henriquevedoveli@gmail.com>
-# Notas      : A classe handDetector detecta a presenca de maos em imagens ou videos
-
-# bibliotecas necessarias
 import cv2
 import mediapipe as mp
 import time
 
 
-class handDetector():
+class Detector():
     def __init__(self, mode = False, modelComplexity = 1, maxHands = 2, detectionCon=0.5,trackCon = 0.5):
-        self.mode = mode
-        self.maxHands = maxHands
-        self.detectionCon = detectionCon
-        self.trackCon = trackCon
+        """
+        HandDetector class detects the presence of hands in images or videos.
 
-        self.mpHands = mp.solutions.hands
-        self.hands   = self.mpHands.Hands(self.mode, self.maxHands, modelComplexity ,
-                                        self.detectionCon, self.trackCon)
-        self.mpDraw  = mp.solutions.drawing_utils
-        self.tipIds = [4,8,12,16,20] 
+        Parameters:
+        mode (bool): Whether to detect multiple hands.
+        modelComplexity (int): Complexity of the hand detection model (0, 1, or 2).
+        maxHands (int): Maximum number of hands to detect.
+        detectionCon (float): Detection confidence threshold.
+        trackCon (float): Tracking confidence threshold.
+        """
 
+        self.mp = mp.solutions.hands
+        self.hands   = self.mp.Hands(
+            mode, maxHands, modelComplexity, detectionCon, trackCon
+            )
+        self.mp_draw  = mp.solutions.drawing_utils
+        self.tip_ids = [4,8,12,16,20] # Media Pipe Tip Ids
 
-    # A funcao findHands encontra as maos nas imagens ou videos.
-    #
-    # Eh passado como parametro a imagem onde vai ser detectado a presenca da mao
-    # e draw, que por padrao eh passado como verdadeiro, caso draw seja False 
-    # nao sera desenhado as landmarks
-    #
-    # A funcao retorna a imagem com o desenho das landmarks
     def findHands(self, img, draw=True):
+        """
+        Find hands in images or videos.
 
+        Parameters:
+        img (numpy.ndarray): Image or video frame to detect hands.
+        draw (bool): Whether to draw landmarks on the image.
+
+        Returns:
+        numpy.ndarray: Image with drawn landmarks (if draw is True).
+        """
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         
-        if self.results.multi_hand_landmarks:
-            for handLms in self.results.multi_hand_landmarks:
-                if draw:
-                    self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
+        if self.results.multi_hand_landmarks and draw:
+            for hand_landmarks in self.results.multi_hand_landmarks:
+                self.mp_draw.draw_landmarks(img, hand_landmarks, self.mp.HAND_CONNECTIONS)
         
         return img
 
 
-    # A funcao findPosition encontra a posicao das landmarks na imagem
-    # 
-    # Eh passado como parametro a imagem, que ja deve conter as landmarks,
-    # o numero da mao e draw que caso seja False nao sera desenhado os circulos das landmarks
-    #
-    # A funcao retorna uma lista contendo o id da landmark, o valor de x e y
     def findPosition(self, img, handNo = 0, draw = True):
+        """
+        Find the position of hand landmarks in the image.
+
+        Parameters:
+        img (numpy.ndarray): Image with detected landmarks.
+        handNo (int): Hand index to consider when multiple hands are detected.
+        draw (bool): Whether to draw circles around landmarks.
+
+        Returns:
+        list: List containing id of the landmark, x, and y positions.
+        """
         self.lmList = []
 
         if self.results.multi_hand_landmarks:
             myHand = self.results.multi_hand_landmarks[handNo]
             for id, lm in enumerate(myHand.landmark):
-                # altura largura e cor da img
                 h,w,_ = img.shape
-                # cx - centro de x ; cy - centro de y
                 cx, cy = int(lm.x*w), int(lm.y*h)
                 self.lmList.append([id, cx,cy])
                 if draw:
@@ -67,25 +70,31 @@ class handDetector():
         return self.lmList
 
     def fingersUp(self):
+        """
+        Determine which fingers are up based on the landmarks.
+
+        Returns:
+        list: A list representing the state of each finger (0: closed, 1: open).
+        """
         fingers = []
         hand = []
 
         if self.lmList[2][1] > self.lmList[17][1]:
             hand.append(1)
-            if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0]-1][1]:
+            if self.lmList[self.tip_ids[0]][1] > self.lmList[self.tip_ids[0]-1][1]:
                 fingers.append(1)
             else:
                 fingers.append(0)
         elif self.lmList[2][1] <= self.lmList[17][1]: 
             hand.append(0)
-            if self.lmList[self.tipIds[0]][1] < self.lmList[self.tipIds[0]-1][1]:
+            if self.lmList[self.tip_ids[0]][1] < self.lmList[self.tip_ids[0]-1][1]:
                 fingers.append(1)
             else:
                 fingers.append(0)
 
     
         for id in range(1,5):
-            if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id]-2][2]:
+            if self.lmList[self.tip_ids[id]][2] < self.lmList[self.tip_ids[id]-2][2]:
                 fingers.append(1)
             else:
                 fingers.append(0)
@@ -99,8 +108,7 @@ def main():
     pTime   = 0
     cTime   = 0
     cap = cv2.VideoCapture(0)
-    # criando o obj handDetector
-    detector = handDetector()
+    detector = Detector()
 
     while True:
         # lendo imagem da webcam e criando imgs a partir do video
@@ -122,10 +130,6 @@ def main():
 
         cv2.imshow("Image",img)
         cv2.waitKey(1)
-
-
-
-
 
 if __name__ == "__main__":
     main()
