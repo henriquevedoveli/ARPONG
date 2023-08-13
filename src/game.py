@@ -1,8 +1,8 @@
 import cv2 as cv
 import numpy as np
 from typing import List
-from handDetection import HandDetector
-import utils
+from src.handDetection import HandDetector
+import src.utils as utils
 
 class Game:
     def __init__(self) -> None:
