@@ -11,11 +11,11 @@ fonttools==4.41.1
 identify==2.5.25
 kiwisolver==1.4.4
 matplotlib==3.7.2
-mediapipe==0.10.2
+mediapipe
 nodeenv==1.8.0
 numpy==1.25.1
 opencv-contrib-python==4.8.0.74
-opencv-python==4.8.0.74
+opencv-python-headless
 packaging==23.1
 Pillow==10.0.0
 platformdirs==3.9.1
